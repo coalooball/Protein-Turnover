@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, send_from_directory
 
-app = Flask(__name__, static_folder='dist', static_url_path="/vue")
+app = Flask(__name__, static_folder='dist', static_url_path="/protein_turnover")
 
 @app.route('/api/data')
 def get_data():
