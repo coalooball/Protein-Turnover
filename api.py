@@ -2,6 +2,7 @@ import os
 import platform
 import psutil
 import time
+import clickhouse_connect
 
 
 def api_host_informations():
@@ -63,3 +64,14 @@ def api_host_informations():
         {"key": "Logged-in Users", "value": users},
         {"key": "Battery Status", "value": battery_status},
     ]
+
+
+def test_clickhouse_connection(host, port, username, password):
+    try:
+        client = clickhouse_connect.get_client(
+            host=host, port=int(port), username=username, password=password
+        )
+        client.ping()
+        return True
+    except Exception as e:
+        return False
