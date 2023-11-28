@@ -19,12 +19,14 @@ def test_clickhouse_connection():
     password = data.get("password")
     return jsonify(api.test_clickhouse_connection(host, port, username, password))
 
+@app.route("/api/get_clickhouse_connection_info")
+def get_clickhouse_connection_info():
+    return jsonify(api.get_clickhouse_connection_info())
 
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def static_proxy(path):
     return send_from_directory(app.static_folder, "index.html")
-
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=9880)

@@ -4,6 +4,11 @@ import psutil
 import time
 import clickhouse_connect
 
+# CC stands for clickhouse connect
+CC_HOST = None
+CC_PORT = None
+CC_USERNAME = None
+CC_PASSWORD = None
 
 def api_host_informations():
     memory = psutil.virtual_memory()
@@ -65,12 +70,38 @@ def api_host_informations():
         {"key": "Battery Status", "value": battery_status},
     ]
 
-
 def test_clickhouse_connection(host, port, username, password):
+    global CC_HOST
+    global CC_PORT
+    global CC_USERNAME
+    global CC_PASSWORD
     try:
         client = clickhouse_connect.get_client(
             host=host, port=int(port), username=username, password=password
         )
-        return client.ping()
+        res = client.ping()
+        if res:
+            CC_HOST = host
+            CC_PORT = port
+            CC_USERNAME = username
+            CC_PASSWORD = password
+            return True
+        else:
+            return False
     except Exception as e:
         return False
+    
+def get_clickhouse_connection_info():
+    global CC_HOST
+    global CC_PORT
+    global CC_USERNAME
+    global CC_PASSWORD
+    if CC_HOST and CC_PORT and CC_USERNAME and CC_PASSWORD:
+        return {
+            'host': CC_HOST,
+            'port': CC_PORT,
+            'username': CC_USERNAME,
+            'password': CC_PASSWORD,
+        }
+    else:
+        return None
