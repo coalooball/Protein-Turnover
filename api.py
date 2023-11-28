@@ -71,7 +71,6 @@ def test_clickhouse_connection(host, port, username, password):
         client = clickhouse_connect.get_client(
             host=host, port=int(port), username=username, password=password
         )
-        client.ping()
-        return True
+        return client.ping()
     except Exception as e:
         return False
