@@ -23,6 +23,16 @@ def test_clickhouse_connection():
 def get_clickhouse_connection_info():
     return jsonify(api.get_clickhouse_connection_info())
 
+@app.route("/api/bool_check_clickhouse_connection")
+def bool_check_clickhouse_connection():
+    return jsonify(api.bool_check_clickhouse_connection())
+
+@app.route("/api/find_all_mzML_pepxml_files_in_dir", methods=["POST"])
+def find_all_mzML_pepxml_files_in_dir():
+    data: dict = request.get_json()
+    dir = data.get("dir")
+    return jsonify(api.find_all_mzML_pepxml_files_in_dir(dir))
+
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def static_proxy(path):

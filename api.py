@@ -9,6 +9,7 @@ CC_HOST = None
 CC_PORT = None
 CC_USERNAME = None
 CC_PASSWORD = None
+CC_VALIDITY: bool = False
 
 def api_host_informations():
     memory = psutil.virtual_memory()
@@ -75,6 +76,7 @@ def test_clickhouse_connection(host, port, username, password):
     global CC_PORT
     global CC_USERNAME
     global CC_PASSWORD
+    global CC_VALIDITY
     try:
         client = clickhouse_connect.get_client(
             host=host, port=int(port), username=username, password=password
@@ -85,8 +87,10 @@ def test_clickhouse_connection(host, port, username, password):
             CC_PORT = port
             CC_USERNAME = username
             CC_PASSWORD = password
+            CC_VALIDITY = True
             return True
         else:
+            CC_VALIDITY = False
             return False
     except Exception as e:
         return False
@@ -105,3 +109,22 @@ def get_clickhouse_connection_info():
         }
     else:
         return None
+
+def bool_check_clickhouse_connection():
+    global CC_VALIDITY
+    return CC_VALIDITY
+    
+def find_all_mzML_pepxml_files_in_dir(dir: str):
+    if not os.path.isdir(dir):
+        return {
+            'status': False,
+            'msg': f"Directory`{dir}` does not exist.",
+            'files': []
+        }
+    return {
+        'status': True,
+        'msg': "",
+        'files': [*filter(lambda x: x.endswith('pep.xml') or x.endswith('mzML'), os.listdir(dir))]
+    }
+    
+    
