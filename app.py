@@ -48,6 +48,16 @@ def delete_clickhouse_information():
     id = data.get("data")
     return jsonify(api.delete_clickhouse_information(id))
 
+@app.route("/api/get_all_names_of_clickhouse_information")
+def get_all_names_of_clickhouse_information():
+    return jsonify(api.get_all_names_of_clickhouse_information())
+
+@app.route("/api/get_clickhouse_information_by_name", methods=["POST"])
+def get_clickhouse_information_by_name():
+    data: dict = request.get_json()
+    name = data.get("data")
+    return jsonify(api.get_clickhouse_information_by_name(name))
+
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def static_proxy(path):

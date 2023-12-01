@@ -49,6 +49,24 @@ VALUES (?, ?, ?, ?, ?);
         conn.commit()
         cursor.close()
         conn.close()
+        
+    def get_all_names_of_clickhouse_information(self) -> list:
+        conn = sqlite3.connect(SQLITE_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM clickhouse_connections")
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return rows
+        
+    def get_clickhouse_information_by_name(self, name) -> list:
+        conn = sqlite3.connect(SQLITE_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT host, port, username, password FROM clickhouse_connections WHERE name = ?", (name,))
+        row = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return row
     
     def __del__(self) -> None:
         if self.conn is not None:

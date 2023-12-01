@@ -5,6 +5,7 @@ import time
 import clickhouse_connect
 import meta_data
 import sqlite3
+import itertools
 
 # CC stands for clickhouse connect
 CC_HOST = None
@@ -186,4 +187,35 @@ def delete_clickhouse_information(id) -> dict:
     return {
         'msg': error_msg,
         'success': success,
+    }
+    
+def get_all_names_of_clickhouse_information() -> list:
+    error_msg: str = ''
+    success = True
+    data = None
+    try:
+        data = ProteinTurnoverData.get_all_names_of_clickhouse_information()
+        data = list(map(lambda x: x[0], data))
+    except Exception as e:
+        success = False
+        error_msg = str(e)
+    return {
+        'msg': error_msg,
+        'success': success,
+        'data': data
+    }
+    
+def get_clickhouse_information_by_name(name) -> list:
+    error_msg: str = ''
+    success = True
+    data = None
+    try:
+        data = ProteinTurnoverData.get_clickhouse_information_by_name(name)
+    except Exception as e:
+        success = False
+        error_msg = str(e)
+    return {
+        'msg': error_msg,
+        'success': success,
+        'data': data
     }
