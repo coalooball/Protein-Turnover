@@ -3,12 +3,11 @@ from flask import request
 from flask import Flask, jsonify, send_from_directory
 
 app = Flask(__name__, static_folder="dist", static_url_path="/protein_turnover")
-
+api.initialize_sqlite_db()
 
 @app.route("/api/host_informations")
 def get_data():
     return jsonify(api.api_host_informations())
-
 
 @app.route("/api/test_clickhouse_connection", methods=["POST"])
 def test_clickhouse_connection():
@@ -32,6 +31,22 @@ def find_all_mzML_pepxml_files_in_dir():
     data: dict = request.get_json()
     dir = data.get("dir")
     return jsonify(api.find_all_mzML_pepxml_files_in_dir(dir))
+
+@app.route("/api/create_clickhouse_information", methods=["POST"])
+def create_clickhouse_information():
+    data: dict = request.get_json()
+    values = data.get("data")
+    return jsonify(api.create_clickhouse_information(values))
+
+@app.route("/api/read_all_clickhouse_information")
+def read_all_clickhouse_information():
+    return jsonify(api.read_all_clickhouse_information())
+
+@app.route("/api/delete_clickhouse_information", methods=["POST"])
+def delete_clickhouse_information():
+    data: dict = request.get_json()
+    id = data.get("data")
+    return jsonify(api.delete_clickhouse_information(id))
 
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")

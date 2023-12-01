@@ -3,6 +3,7 @@ import platform
 import psutil
 import time
 import clickhouse_connect
+import meta_data
 
 # CC stands for clickhouse connect
 CC_HOST = None
@@ -10,6 +11,8 @@ CC_PORT = None
 CC_USERNAME = None
 CC_PASSWORD = None
 CC_VALIDITY: bool = False
+# DATA
+ProteinTurnoverData: meta_data.ProteinTurnoverDataClass = None
 
 def api_host_informations():
     memory = psutil.virtual_memory()
@@ -127,4 +130,56 @@ def find_all_mzML_pepxml_files_in_dir(dir: str):
         'files': [*filter(lambda x: x.endswith('pep.xml') or x.endswith('mzML'), os.listdir(dir))]
     }
     
+def initialize_sqlite_db():
+    global ProteinTurnoverData
+    ProteinTurnoverData = meta_data.ProteinTurnoverDataClass()
     
+def create_clickhouse_information(data: list) -> dict:
+    error_keys = []
+    required_keys = ('name', 'host', 'port', 'username', 'password')
+    for idx, datum in enumerate(data):
+        if not datum:
+            error_keys.append(required_keys[idx])
+    if error_keys:
+        return {
+            'msg': f"The values of the following fields are empty: {','.join(error_keys)}",
+            'success': False
+        }
+    error_msg: str = ''
+    success = True
+    try:
+        ProteinTurnoverData.create_clickhouse_information(data)
+    except Exception as e:
+        success = False
+        error_msg = str(e)
+    return {
+        'msg': error_msg,
+        'success': success
+    }
+    
+def read_all_clickhouse_information() -> dict:
+    error_msg: str = ''
+    success = True
+    try:
+        data = ProteinTurnoverData.read_all_clickhouse_information()
+    except Exception as e:
+        success = False
+        error_msg = str(e)
+    return {
+        'msg': error_msg,
+        'success': success,
+        'data': data
+    }
+    
+def delete_clickhouse_information(id) -> dict:
+    error_msg: str = ''
+    success = True
+    try:
+        ProteinTurnoverData.delete_clickhouse_information(id)
+    except Exception as e:
+        success = False
+        error_msg = str(e)
+    return {
+        'msg': error_msg,
+        'success': success,
+    }
