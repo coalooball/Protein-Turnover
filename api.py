@@ -4,6 +4,7 @@ import psutil
 import time
 import clickhouse_connect
 import meta_data
+import sqlite3
 
 # CC stands for clickhouse connect
 CC_HOST = None
@@ -149,6 +150,9 @@ def create_clickhouse_information(data: list) -> dict:
     success = True
     try:
         ProteinTurnoverData.create_clickhouse_information(data)
+    except sqlite3.IntegrityError as e:
+        success = False
+        error_msg = "The name of the Clickhouse information you added is duplicated."
     except Exception as e:
         success = False
         error_msg = str(e)
