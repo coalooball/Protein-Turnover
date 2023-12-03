@@ -1,5 +1,5 @@
 import api
-from flask import request
+from flask import request, Response, stream_with_context
 from flask import Flask, jsonify, send_from_directory
 
 app = Flask(__name__, static_folder="dist", static_url_path="/protein_turnover")
@@ -57,6 +57,11 @@ def get_clickhouse_information_by_name():
     data: dict = request.get_json()
     name = data.get("data")
     return jsonify(api.get_clickhouse_information_by_name(name))
+
+@app.route('/api/load_files_sse')
+def load_files_sse():
+    file_paths = request.args.getlist('filePath')
+    return Response(stream_with_context(api.load_files_sse(file_paths)), content_type='text/event-stream')
 
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
