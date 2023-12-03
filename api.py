@@ -9,6 +9,7 @@ import json
 import sqls
 import pyopenms as oms
 from pyteomics import pepxml
+import itertools
 
 # CC stands for clickhouse connect
 CC_HOST = None
@@ -316,4 +317,24 @@ def load_mzml_data(file_path: str):
             yield convert_sse_data_string({"data": "", "status": "success", "message": f"Insert file data '{filename}' successfully"})
         except Exception as e:
             yield convert_sse_data_string({"data": "", "status": "error", "message": f"Error: {str(e)} when loading file '{filename}'"})
+            
+def get_all_pepxml_table_names():
+    with ClickhouseConnection() as c:
+        result = c.query(sqls.make_get_all_pepxml_table_names())
+        return [trip_table_name_prefix_and_suffix(s) for s in itertools.chain.from_iterable(result.result_rows)]
+            
+def get_all_mzml_table_names():
+    with ClickhouseConnection() as c:
+        result = c.query(sqls.make_get_all_mzml_table_names())
+        return [trip_table_name_prefix_and_suffix(s) for s in itertools.chain.from_iterable(result.result_rows)]
         
+def trip_table_name_prefix_and_suffix(s: str):
+    if s.startswith("protein_turnover_"):
+        s = s[len("protein_turnover_"):]
+    if s.endswith("_pep_xml"):
+        s = s[:-len("_pep_xml")]
+    if s.endswith("_mzml"):
+        s = s[:-len("_mzml")]
+    if s.endswith("_pepxml"):
+        s = s[:-len("_pepxml")]
+    return s

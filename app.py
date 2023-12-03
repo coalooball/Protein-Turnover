@@ -63,6 +63,14 @@ def load_files_sse():
     file_paths = request.args.getlist('filePath')
     return Response(stream_with_context(api.load_files_sse(file_paths)), content_type='text/event-stream')
 
+@app.route("/api/get_all_pepxml_table_names")
+def get_all_pepxml_table_names():
+    return jsonify(api.get_all_pepxml_table_names())
+
+@app.route("/api/get_all_mzml_table_names")
+def get_all_mzml_table_names():
+    return jsonify(api.get_all_mzml_table_names())
+
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def static_proxy(path):

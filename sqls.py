@@ -1,13 +1,16 @@
 """Generate some SQL statements."""
 
-PROTEIN_TURNOVER = 'protein_turnover'
+PROTEIN_TURNOVER = "protein_turnover"
+
 
 def add_prefix_for_table_name(func):
     def inner(table_name):
-        full_name = PROTEIN_TURNOVER + '_' + table_name
+        full_name = PROTEIN_TURNOVER + "_" + table_name
         res = func(full_name)
         return res
+
     return inner
+
 
 @add_prefix_for_table_name
 def make_pepxml_create_table_sql(table_name: str) -> str:
@@ -54,6 +57,7 @@ ORDER BY spectrum
 SETTINGS index_granularity = 8192
 """
 
+
 @add_prefix_for_table_name
 def make_mzml_create_table_sql(table_name: str) -> str:
     return f"""CREATE TABLE default.{table_name}
@@ -67,10 +71,19 @@ ORDER BY RT
 SETTINGS index_granularity = 8192
 """
 
+
 @add_prefix_for_table_name
 def make_find_table_in_system_table(table_name: str) -> str:
     return f"""select name from `system`.`tables` where `database` = 'default' and name = '{table_name}'"""
 
+
 @add_prefix_for_table_name
 def get_full_table_name(table_name: str) -> str:
     return table_name
+
+
+def make_get_all_pepxml_table_names() -> str:
+    return r"select name from `system`.`tables` where `database` = 'default' and name like 'protein_turnover%xml'"
+
+def make_get_all_mzml_table_names() -> str:
+    return r"select name from `system`.`tables` where `database` = 'default' and name like 'protein_turnover%mzml'"
