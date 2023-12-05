@@ -157,6 +157,7 @@ def find_all_mzML_pepxml_files_in_dir(dir: str):
             'files': [],
             'sep': os.path.sep
         }
+    insert_history_dirs(dir)
     return {
         'status': True,
         'msg': "",
@@ -338,3 +339,27 @@ def trip_table_name_prefix_and_suffix(s: str):
     if s.endswith("_pepxml"):
         s = s[:-len("_pepxml")]
     return s
+
+def get_history_dirs():
+    if not bool_history_dirs_exist():
+        return[]
+    with ClickhouseConnection() as c:
+        result = c.query(sqls.make_get_all_history_dirs())
+        return list(itertools.chain.from_iterable(result.result_rows))
+
+def bool_history_dirs_exist() -> bool:
+    tbl = 'history_dirs'
+    with ClickhouseConnection() as c:
+        table_exist = c.query(sqls.make_find_table_in_system_table(tbl))
+        if not table_exist.result_rows or all(not row for row in table_exist.result_rows):
+            return False
+        else:
+            return True
+
+def insert_history_dirs(dir):
+    exist = bool_history_dirs_exist()
+    with ClickhouseConnection() as c:
+        if not exist:
+            c.command(sqls.make_history_dirs_ddl())
+        c.insert(sqls.get_full_table_name('history_dirs'), [[dir]], column_names=['dirs'])
+    

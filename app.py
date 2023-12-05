@@ -71,6 +71,10 @@ def get_all_pepxml_table_names():
 def get_all_mzml_table_names():
     return jsonify(api.get_all_mzml_table_names())
 
+@app.route("/api/get_history_dirs")
+def get_history_dirs():
+    return jsonify(api.get_history_dirs())
+
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def static_proxy(path):

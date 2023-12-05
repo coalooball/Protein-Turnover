@@ -87,3 +87,13 @@ def make_get_all_pepxml_table_names() -> str:
 
 def make_get_all_mzml_table_names() -> str:
     return r"select name from `system`.`tables` where `database` = 'default' and name like 'protein_turnover%mzml'"
+
+def make_history_dirs_ddl() -> str:
+    return f"""CREATE TABLE {get_full_table_name('history_dirs')} (
+    dirs String
+) ENGINE = MergeTree()
+ORDER BY dirs;
+"""
+
+def make_get_all_history_dirs() -> str:
+    return f"select distinct(dirs) from {get_full_table_name('history_dirs')}"
